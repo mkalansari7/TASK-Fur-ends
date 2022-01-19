@@ -1,19 +1,16 @@
+import { getSuggestedQuery } from "@testing-library/react";
 import React, { useState } from "react";
 import PetItem from "./PetItem";
+import SearchBar from "./SearchBar";
 
-export default function PetsList(props) {
-  const [query, setQuery] = useState("");
+export default function PetsList({ pets }) {
+  const [petsFeltered, setPetsFeltered] = useState(pets);
   const [type, setType] = useState("");
-  const pets = props.pets
-    .filter(
-      (pet) =>
-        pet.name.toLowerCase().includes(query.toLowerCase()) &&
-        pet.type.includes(type)
-    )
-    .map((pet) => <PetItem key={pet.id} pet={pet} />);
 
-  const onChangeSearch = (e) => {
-    setQuery(e.target.value);
+  const search = (query) => {
+    setPetsFeltered(
+      pets.filter((pet) => pet.name.toLowerCase().includes(query.toLowerCase()))
+    );
   };
   const changePetSelctor = (event) => {
     setType(event.target.value);
@@ -28,16 +25,7 @@ export default function PetsList(props) {
               <h1 class="mb-25 wow fadeInUp" data-wow-delay=".2s">
                 Fur-ends
               </h1>
-              <div class="input-group rounded">
-                <input
-                  type="search"
-                  class="form-control rounded"
-                  placeholder="Search"
-                  aria-label="Search"
-                  aria-describedby="search-addon"
-                  onChange={onChangeSearch}
-                />
-              </div>
+              <SearchBar search={search} />
               <br />
               Type:
               <select onChange={changePetSelctor} class="form-select">
@@ -52,7 +40,13 @@ export default function PetsList(props) {
           </div>
         </div>
 
-        <div class="row justify-content-center">{pets}</div>
+        <div class="row justify-content-center">
+          {petsFeltered
+            .filter((pet) => pet.type.includes(type))
+            .map((pet) => (
+              <PetItem key={pet.id} pet={pet} />
+            ))}
+        </div>
       </div>
     </section>
   );
